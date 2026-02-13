@@ -11,8 +11,8 @@ using The590Box.Properties;
 
 // Code : Kees van Engelen (keesvanengelen@gmail.com)
 // 
-// Version : 16-x (09 feb 26); 
-// Name    : The101Box Yaesu FTDX101 @ COMx
+// Version : 1 (13 feb 26); 
+// Name    : The590Box Yaesu FTDX101 @ COMx
 
 
 namespace The590Box
@@ -29,6 +29,7 @@ namespace The590Box
         // Add a field to track the RX antenna state
         private bool isRxAntennaOn = false;
         private bool isDataOn = false; // Tracks the current DATA state
+        private bool isMenuA = true; // Tracks the current MENU state
   //      private bool isRxAntennaOff = false;
         public MainForm()
         {
@@ -54,7 +55,7 @@ namespace The590Box
             string portName = SelectSerialPort();
             
             // Update form title with selected COM port
-            this.Text = $"The101Box v 16 - by Kees, ON9KVE - {portName}";
+            this.Text = $"The590Box v 1 - by Kees, ON9KVE - {portName}";
 
             Serial_Port = new SerialPort(portName, 115200, Parity.None, 8, StopBits.One)
             {
@@ -105,18 +106,15 @@ namespace The590Box
             {
                 try
                 {
-                    // Discard buffers at the start of each loop to prevent stale data
                     Serial_Port.DiscardInBuffer();
                     Serial_Port.DiscardOutBuffer();
-
-
 
                     // Read Mode ("MD;")
                     IssueCmd("MD;");
                     temp = Serial_Port.ReadTo(";");
-                    if (temp.Length >= 3) // Ensure the response is at least 3 characters long
+                    if (temp.Length >= 3)
                     {
-                        Mode = temp.Substring(2, 1); // Extract the mode value
+                        Mode = temp.Substring(2, 1);
                         ModeD = Mode switch
                         {
                             "1" => "LSB",
@@ -124,70 +122,51 @@ namespace The590Box
                             "3" => "CW",
                             "4" => "FM",
                             "5" => "AM",
-                            _ => "???", // Unknown mode
+                            _ => "???",
                         };
                     }
                     else
                     {
-                        ModeD = "???"; // Invalid response
+                        ModeD = "???";
                     }
 
-                    // Read Data ("DA;")
-                    //                 IssueCmd("DA;");
-                    //                 temp = Serial_Port.ReadTo(";");
-                    //                 if (temp.Length >= 3) // Ensure the response is at least 3 characters long
-                    //                 {
-                    //                     DataB = temp.Substring(2, 1); // Extract the data flag
-                    //                     DATABD = DataB switch
-                    //                     {
-                    //                         "0" => " ",    // Data off
-                    //                         "1" => "DATA", // Data on
-                    //                         _ => "???",    // Unknown data state
-                    //                     };
-                    //                 }
-                    //                 else
-                    //                {
-                    //                     DATABD = "???"; // Invalid response
-                    //                 }
-                    //
-                    //                 // Update the MODEDATA_box with the combined Mode and Data
                     MODE_box.Text = ModeD;
 
-
-                    IssueCmd("AN;"); // Send command to read antenna status
-                    temp = Serial_Port.ReadTo(";"); // Read response from the serial port
-
-                    if (temp.Length >= 4) // Ensure the response is at least 4 characters long (ANxyz)
+                    // Read Antenna Status ("AN;")
+                    IssueCmd("AN;");
+                    temp = Serial_Port.ReadTo(";");
+                    if (temp.Length >= 4)
                     {
-                        string x = temp.Substring(2, 1); // Extract the value of x
-                        string y = temp.Substring(3, 1); // Extract the value of y
-
+                        string x = temp.Substring(2, 1);
+                        string y = temp.Substring(3, 1);
                         DspantD = y switch
                         {
                             "0" => x switch
                             {
-                                "1" => "ANT 1", // ANT 1 is connected, RX not used
-                                "2" => "ANT 2", // ANT 2 is connected, RX not used
-                                _ => "???",     // Unknown antenna
+                                "1" => "ANT 1",
+                                "2" => "ANT 2",
+                                _ => "???",
                             },
-                            "1" => "RX ANT",    // RX antenna is used
-                            _ => "???",         // Unknown RX state
+                            "1" => "RX ANT",
+                            _ => "???",
                         };
                     }
                     else
                     {
-                        DspantD = "???"; // Invalid response
+                        DspantD = "???";
                     }
 
+                    // Read Preamp Status ("PA;")
                     IssueCmd("PA;");
                     temp = Serial_Port.ReadTo(";");
-                    if (temp.Length >= 4)
+                    if (temp.Length >= 3)
                     {
                         Dspipo = temp.Substring(2, 1);
                         DspipoD = Dspipo switch
                         {
                             "0" => "AMP off",
                             "1" => "AMP on",
+                            _ => "???",
                         };
                     }
                     else
@@ -195,6 +174,24 @@ namespace The590Box
                         DspipoD = "???";
                     }
 
+                    // Read Menu State ("MF;")
+                    IssueCmd("MF;");
+                    temp = Serial_Port.ReadTo(";");
+                    if (temp.Length >= 3)
+                    {
+                        string menuState = temp.Substring(2, 1);
+                        isMenuA = menuState == "0";
+                        
+                        // Update button appearance on UI thread
+                        if (MENU.InvokeRequired)
+                        {
+                            MENU.Invoke((Action)(() => UpdateMenuButtonAppearance()));
+                        }
+                        else
+                        {
+                            UpdateMenuButtonAppearance();
+                        }
+                    }
 
                     string Blokje = "█";
                     Bar = (Bar == Blokje) ? " " : Blokje;
@@ -202,66 +199,65 @@ namespace The590Box
                     // Update UI
                     UpdateTextBox(MODE_box, ModeD);
                     UpdateTextBox(ANT_box, DspantD);
-                    UpdateTextBox(IPO_box, DspipoD); //IPO = preamp
+                    UpdateTextBox(IPO_box, DspipoD);
                     UpdateTextBox(BUSY_box, Bar);
 
-
                     // Sync sliders with radio values
-                    // Detach event handlers to prevent sending commands when setting values
                     rfGainTrackBar.ValueChanged -= RfGainTrackBar_ValueChanged;
                     volumeGainTrackBar.ValueChanged -= VolumeGainTrackBar_ValueChanged;
                     pwrControlTrackBar.ValueChanged -= PwrControlTrackBar_ValueChanged;
+                    SQLtrackBar.ValueChanged -= SQLtrackBar_ValueChanged;  // ADD THIS LINE
 
-                    // Read and set RF gain slider
+                    // Read and set RF gain slider (RGxxx;)
                     IssueCmd("RG;");
                     temp = Serial_Port.ReadTo(";");
-                    if (temp.Length >= 5)
+                    if (temp.Length >= 6)
                     {
-                        string rgValueStr = temp.Substring(3, 3); // Extract the RF gain value
+                        string rgValueStr = temp.Substring(3, 3);
                         if (int.TryParse(rgValueStr, out int rgValue))
                         {
-                            int sliderValue = rfGainTrackBar.Maximum - rgValue; // Invert the value for the slider
+                            int sliderValue = rfGainTrackBar.Maximum - rgValue;  // Invert: 0→255, 255→0
                             rfGainTrackBar.Value = Math.Max(rfGainTrackBar.Minimum, Math.Min(rfGainTrackBar.Maximum, sliderValue));
-                            UpdateTextBox(textBox1, sliderValue.ToString("D3")); // Display the slider value in textBox1
+                            UpdateTextBox(textBox1, sliderValue.ToString("D3"));  // Display inverted value
                         }
                     }
 
-                    // Read and set volume slider
+                    // Read and set volume slider (AG0xxx;)
                     IssueCmd("AG0;");
                     temp = Serial_Port.ReadTo(";");
-                    if (temp.Length >= 5)
+                    if (temp.Length >= 6)
                     {
                         string agValueStr = temp.Substring(3, 3);
                         if (int.TryParse(agValueStr, out int agValue))
                         {
                             volumeGainTrackBar.Value = Math.Max(volumeGainTrackBar.Minimum, Math.Min(volumeGainTrackBar.Maximum, agValue));
-                            UpdateTextBox(textBox2, agValueStr); // Display the Volume gain value in TextBox2
+                            UpdateTextBox(textBox2, agValueStr);
                         }
                     }
 
-                    // Read and set power slider
+                    // Read and set power slider (PCxxx;)
                     IssueCmd("PC;");
                     temp = Serial_Port.ReadTo(";");
                     if (temp.Length >= 5)
                     {
-                        string pcValueStr = temp.Substring(2, 3); // Extract the power value
+                        string pcValueStr = temp.Substring(2, 3);
                         if (int.TryParse(pcValueStr, out int pcValue))
                         {
                             pwrControlTrackBar.Value = Math.Max(pwrControlTrackBar.Minimum, Math.Min(pwrControlTrackBar.Maximum, pcValue));
-                            UpdateTextBox(textBox3, pcValue.ToString("D3")); // Display the power value in textBox3
+                            UpdateTextBox(textBox3, pcValue.ToString("D3"));
                         }
                     }
 
-                    // Read and set squelch slider
-                    IssueCmd("SQ;"); // Command to read squelch value
+                    // Read and set squelch slider (SQ0yyy;)
+                    IssueCmd("SQ0;");
                     temp = Serial_Port.ReadTo(";");
-                    if (temp.Length >= 5)
+                    if (temp.Length >= 6)
                     {
-                        string sqValueStr = temp.Substring(2, 3); // Extract the squelch value
+                        string sqValueStr = temp.Substring(3, 3);
                         if (int.TryParse(sqValueStr, out int sqValue))
                         {
                             SQLtrackBar.Value = Math.Max(SQLtrackBar.Minimum, Math.Min(SQLtrackBar.Maximum, sqValue));
-                            UpdateTextBox(SQLTextBox, sqValueStr); // Display the squelch value in SQLTextBox
+                            UpdateTextBox(SQLTextBox, sqValueStr);
                         }
                     }
 
@@ -269,36 +265,74 @@ namespace The590Box
                     rfGainTrackBar.ValueChanged += RfGainTrackBar_ValueChanged;
                     volumeGainTrackBar.ValueChanged += VolumeGainTrackBar_ValueChanged;
                     pwrControlTrackBar.ValueChanged += PwrControlTrackBar_ValueChanged;
+                    SQLtrackBar.ValueChanged += SQLtrackBar_ValueChanged;  // ADD THIS LINE
 
-
+                    // Read and set VFO1 frequency (FAxxxxxxxxx;)
                     IssueCmd("FA;");
                     temp = Serial_Port.ReadTo(";");
                     string vfo1Freq = "???";
-                    if (temp.Length >= 4) // FA + at least 1 digit + ;
+                    if (temp.Length >= 3)
                     {
-                        string freqStr = temp.Substring(2, temp.Length - 3); // Extract digits between FA and ;
+                        string freqStr = temp.Substring(2, temp.Length - 3);
                         if (long.TryParse(freqStr, out long freqHz))
                         {
-                            double freqMHz = freqHz / 100000.0; // Correct divisor for this radio
-                            vfo1Freq = $"{freqMHz,9:F3}"; // Right-align in 9 characters with 3 decimals
+                            double freqMHz = freqHz / 100000.0;
+                            vfo1Freq = $"{freqMHz,9:F3}";
                         }
                     }
 
+                    // Read and set VFO2 frequency (FBxxxxxxxxx;)
                     IssueCmd("FB;");
                     temp = Serial_Port.ReadTo(";");
                     string vfo2Freq = "???";
-                    if (temp.Length >= 4) // FB + at least 1 digit + ;
+                    if (temp.Length >= 3)
                     {
-                        string freqStr = temp.Substring(2, temp.Length - 3); // Extract digits between FB and ;
+                        string freqStr = temp.Substring(2, temp.Length - 3);
                         if (long.TryParse(freqStr, out long freqHz))
                         {
-                            double freqMHz = freqHz / 100000.0; // Correct divisor for this radio
-                            vfo2Freq = $"{freqMHz,9:F3}"; // Right-align in 9 characters with 3 decimals
+                            double freqMHz = freqHz / 100000.0;
+                            vfo2Freq = $"{freqMHz,9:F3}";
                         }
                     }
 
                     UpdateTextBox(VFO1_box, $"VFO1:{vfo1Freq} MHz");
                     UpdateTextBox(VFO2_box, $"VFO2:{vfo2Freq} MHz");
+
+                    // Read Internal Tuner Status ("AC;")
+                    IssueCmd("AC;");
+                    temp = Serial_Port.ReadTo(";");
+                    if (temp.Length >= 4)
+                    {
+                        string x = temp.Substring(2, 1);  // Extract x (R indicator)
+                        string y = temp.Substring(3, 1);  // Extract y (T indicator)
+                        
+                        // Build the tuner display string
+                        string tunerDisplay = "      ";  // Default: 6 blanks (when x=0, y=0)
+                        
+                        // If x = 1 and/or y = 1, show tuner status
+                        if (x == "1" || y == "1")
+                        {
+                            tunerDisplay = " <AT> ";
+                            
+                            // If x = 1, set first character to "R"
+                            if (x == "1")
+                            {
+                                tunerDisplay = "R<AT> ";
+                            }
+                            
+                            // If y = 1, set last character to "T"
+                            if (y == "1")
+                            {
+                                tunerDisplay = tunerDisplay.Substring(0, 5) + "T";
+                            }
+                        }
+                        
+                        UpdateTextBox(textBox4, tunerDisplay);
+                    }
+                    else
+                    {
+                        UpdateTextBox(textBox4, "      ");
+                    }
 
                     await Task.Delay(100, cts.Token);
                 }
@@ -413,10 +447,10 @@ namespace The590Box
 
         private void RfGainTrackBar_ValueChanged(object sender, EventArgs e)
         {
-            int displayedValue = rfGainTrackBar.Value; // Directly use the slider value for display
+            int displayedValue = rfGainTrackBar.Value;
             string value = displayedValue.ToString("D3");
-            UpdateTextBox(textBox1, value); // Display the value in textBox1
-            IssueCmd($"RG{(rfGainTrackBar.Maximum - displayedValue):D3};"); // Send inverted value to the radio
+            UpdateTextBox(textBox1, value);
+            IssueCmd($"RG{(rfGainTrackBar.Maximum - displayedValue):D3};");  // Invert when sending
         }
 
         private void VolumeGainTrackBar_ValueChanged(object sender, EventArgs e)
@@ -438,7 +472,7 @@ namespace The590Box
             int displayedValue = SQLtrackBar.Value; // Get the slider value
             string value = displayedValue.ToString("D3"); // Format as 3 digits
             UpdateTextBox(SQLTextBox, value); // Update the display in the TextBox
-            IssueCmd($"SQ{value};"); // Send the squelch control command
+            IssueCmd($"SQ0{value};"); // Send the squelch control command
         }
 
 
@@ -450,14 +484,13 @@ namespace The590Box
 
         private void IntTune_Click(object sender, EventArgs e)
         {
-            IssueCmd("AC002;"); // Start tuning
-            IssueCmd("AC001;"); // Set tuning on 
+            IssueCmd("AC111;"); // Start tuning
 
         }
 
         private void ItuneOn_Click(object sender, EventArgs e)
         {
-            IssueCmd("AC001;"); // Turn internal tuner ON
+            IssueCmd("AC110;"); // Turn internal tuner ON
         }
 
         private void ItuneOff_Click(object sender, EventArgs e)
@@ -620,6 +653,35 @@ namespace The590Box
                 {
                     DIGB.BackColor = Color.DarkGray; // DATA is off
                 }
+            }
+        }
+
+        private void MENU_click(object sender, MouseEventArgs e)
+        {
+            if (isMenuA)
+            {
+                IssueCmd("MF1;"); // Switch to Menu B
+                isMenuA = false;
+            }
+            else
+            {
+                IssueCmd("MF0;"); // Switch to Menu A
+                isMenuA = true;
+            }
+            UpdateMenuButtonAppearance();
+        }
+
+        private void UpdateMenuButtonAppearance()
+        {
+            if (isMenuA)
+            {
+                MENU.Text = "MENU A";
+                MENU.BackColor = Color.LimeGreen; // Light green
+            }
+            else
+            {
+                MENU.Text = "MENU B";
+                MENU.BackColor = Color.FromArgb(255, 165, 0); // Amber color
             }
         }
     }

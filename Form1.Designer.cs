@@ -62,7 +62,6 @@ namespace The590Box
             VFO1_box = new System.Windows.Forms.TextBox();
             VFO2_box = new System.Windows.Forms.TextBox();
             MENU = new System.Windows.Forms.Button();
-            textBox5 = new System.Windows.Forms.TextBox();
             SQLtrackBar = new System.Windows.Forms.TrackBar();
             SQLTextBox = new System.Windows.Forms.TextBox();
             SQLLabel = new System.Windows.Forms.Label();
@@ -81,7 +80,7 @@ namespace The590Box
             ExtTuneButton.FlatAppearance.MouseOverBackColor = Color.Blue;
             ExtTuneButton.Font = new Font("Verdana", 8.25F, FontStyle.Bold);
             ExtTuneButton.ForeColor = Color.Yellow;
-            ExtTuneButton.Location = new Point(824, 70);
+            ExtTuneButton.Location = new Point(650, 68);
             ExtTuneButton.Name = "ExtTuneButton";
             ExtTuneButton.Size = new Size(110, 33);
             ExtTuneButton.TabIndex = 8;
@@ -428,7 +427,7 @@ namespace The590Box
             IntTune.FlatAppearance.MouseOverBackColor = Color.Blue;
             IntTune.Font = new Font("Verdana", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             IntTune.ForeColor = Color.Yellow;
-            IntTune.Location = new Point(824, 1);
+            IntTune.Location = new Point(650, 0);
             IntTune.Name = "IntTune";
             IntTune.Size = new Size(110, 35);
             IntTune.TabIndex = 55;
@@ -444,7 +443,7 @@ namespace The590Box
             ItuneOn.FlatAppearance.MouseOverBackColor = Color.Blue;
             ItuneOn.Font = new Font("Verdana", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             ItuneOn.ForeColor = Color.Yellow;
-            ItuneOn.Location = new Point(824, 36);
+            ItuneOn.Location = new Point(650, 34);
             ItuneOn.Name = "ItuneOn";
             ItuneOn.Size = new Size(56, 35);
             ItuneOn.TabIndex = 56;
@@ -460,7 +459,7 @@ namespace The590Box
             ItuneOff.FlatAppearance.MouseOverBackColor = Color.Blue;
             ItuneOff.Font = new Font("Verdana", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             ItuneOff.ForeColor = Color.Yellow;
-            ItuneOff.Location = new Point(878, 36);
+            ItuneOff.Location = new Point(704, 34);
             ItuneOff.Name = "ItuneOff";
             ItuneOff.Size = new Size(56, 35);
             ItuneOff.TabIndex = 57;
@@ -474,7 +473,7 @@ namespace The590Box
             textBox4.BorderStyle = System.Windows.Forms.BorderStyle.None;
             textBox4.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             textBox4.ForeColor = Color.Cyan;
-            textBox4.Location = new Point(827, 103);
+            textBox4.Location = new Point(654, 103);
             textBox4.Margin = new System.Windows.Forms.Padding(0);
             textBox4.Name = "textBox4";
             textBox4.Size = new Size(105, 18);
@@ -551,7 +550,7 @@ namespace The590Box
             // 
             // MENU
             // 
-            MENU.BackColor = Color.DarkGreen;
+            MENU.BackColor = Color.LimeGreen;
             MENU.FlatAppearance.BorderColor = Color.White;
             MENU.FlatAppearance.MouseDownBackColor = Color.Red;
             MENU.FlatAppearance.MouseOverBackColor = Color.Blue;
@@ -561,37 +560,21 @@ namespace The590Box
             MENU.Name = "MENU";
             MENU.Size = new Size(168, 35);
             MENU.TabIndex = 59;
-            MENU.Text = "MENU A/B";
+            MENU.Text = "MENU A";
             MENU.UseVisualStyleBackColor = false;
-            // 
-            // textBox5
-            // 
-            textBox5.BackColor = Color.Black;
-            textBox5.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            textBox5.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            textBox5.ForeColor = Color.Cyan;
-            textBox5.Location = new Point(9, 105);
-            textBox5.Margin = new System.Windows.Forms.Padding(0);
-            textBox5.Name = "textBox5";
-            textBox5.Size = new Size(150, 18);
-            textBox5.TabIndex = 60;
-            textBox5.TabStop = false;
-            textBox5.Text = "<MENU A/B>";
-            textBox5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            MENU.MouseClick += MENU_click;
             // 
             // SQLtrackBar
             // 
             SQLtrackBar.BackColor = Color.DarkGreen;
             SQLtrackBar.Location = new Point(552, 1);
-            SQLtrackBar.Maximum = 100;
-            SQLtrackBar.Minimum = 5;
+            SQLtrackBar.Maximum = 255;
             SQLtrackBar.Name = "SQLtrackBar";
             SQLtrackBar.Orientation = System.Windows.Forms.Orientation.Vertical;
             SQLtrackBar.Size = new Size(45, 102);
             SQLtrackBar.TabIndex = 61;
-            SQLtrackBar.TickFrequency = 5;
+            SQLtrackBar.TickFrequency = 25;
             SQLtrackBar.TickStyle = System.Windows.Forms.TickStyle.Both;
-            SQLtrackBar.Value = 100;
             // 
             // SQLTextBox
             // 
@@ -606,7 +589,7 @@ namespace The590Box
             SQLTextBox.Size = new Size(40, 15);
             SQLTextBox.TabIndex = 62;
             SQLTextBox.TabStop = false;
-            SQLTextBox.Text = "100";
+            SQLTextBox.Text = "000";
             SQLTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             SQLTextBox.WordWrap = false;
             // 
@@ -627,11 +610,10 @@ namespace The590Box
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = Color.Black;
-            ClientSize = new Size(1013, 125);
+            ClientSize = new Size(761, 125);
             Controls.Add(SQLLabel);
             Controls.Add(SQLTextBox);
             Controls.Add(SQLtrackBar);
-            Controls.Add(textBox5);
             Controls.Add(MENU);
             Controls.Add(rfGainLabel);
             Controls.Add(volumeGainLabel);
@@ -673,7 +655,6 @@ namespace The590Box
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "MainForm";
-            Text = "The590Box v 1 - by Kees, ON9KVE -";
             TransparencyKey = Color.Fuchsia;
             ((System.ComponentModel.ISupportInitialize)rfGainTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)volumeGainTrackBar).EndInit();
@@ -684,6 +665,7 @@ namespace The590Box
         }
 
         #endregion
+
         private System.Windows.Forms.Button ExtTuneButton;
         private System.Windows.Forms.Button USBB;
         private System.Windows.Forms.Button LSBB;
@@ -716,7 +698,6 @@ namespace The590Box
         private System.Windows.Forms.TextBox VFO1_box;
         private System.Windows.Forms.TextBox VFO2_box;
         private System.Windows.Forms.Button MENU;
-        private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.TrackBar SQLtrackBar;
         private System.Windows.Forms.TextBox SQLTextBox;
         private System.Windows.Forms.Label SQLLabel;
