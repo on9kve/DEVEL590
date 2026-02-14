@@ -31,6 +31,8 @@ namespace The590Box
         private bool isDataOn = false; // Tracks the current DATA state
         private bool isMenuA = true; // Tracks the current MENU state
   //      private bool isRxAntennaOff = false;
+        private bool isMuted = false;
+        private int savedVolume = 0;
         public MainForm()
         {
             InitializeComponent();
@@ -51,6 +53,7 @@ namespace The590Box
             ExtTuneButton.FlatAppearance.MouseOverBackColor = Color.Blue;
             ExtTuneButton.FlatAppearance.BorderColor = Color.White;
             ExtTuneButton.Paint += TuneButton_Paint;
+            MUTE.Click += MuteButton_Click;  // Wire up MUTE button
 
             string portName = SelectSerialPort();
             
@@ -392,6 +395,12 @@ namespace The590Box
         {
             IssueCmd("MD0;");
             mode = Serial_Port.ReadTo(";");
+
+            // Mute audio on tune
+            IssueCmd("AG0000;");
+            ExtTuneButton.BackColor = Color.Red;
+            isMuted = true;
+
             IssueCmd("PC;");
             string resp = Serial_Port.ReadTo(";");
             Pstr = resp[2..];
@@ -687,6 +696,25 @@ namespace The590Box
             {
                 MENU.Text = "MENU B";
                 MENU.BackColor = Color.FromArgb(255, 165, 0); // Amber color
+            }
+        }
+
+        private void MuteButton_Click(object sender, EventArgs e)
+        {
+            if (isMuted)
+            {
+                // Unmute: Restore saved volume
+                IssueCmd($"AG0{savedVolume:D3};");
+                MUTE.BackColor = Color.DarkGreen;  // Changed from ExtTuneButton to MUTE
+                isMuted = false;
+            }
+            else
+            {
+                // Mute: Save current volume and set to 0
+                savedVolume = volumeGainTrackBar.Value;
+                IssueCmd("AG0000;");
+                MUTE.BackColor = Color.Red;  // Changed from ExtTuneButton to MUTE
+                isMuted = true;
             }
         }
     }

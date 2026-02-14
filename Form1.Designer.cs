@@ -65,6 +65,7 @@ namespace The590Box
             SQLtrackBar = new System.Windows.Forms.TrackBar();
             SQLTextBox = new System.Windows.Forms.TextBox();
             SQLLabel = new System.Windows.Forms.Label();
+            MUTE = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)rfGainTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)volumeGainTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pwrControlTrackBar).BeginInit();
@@ -208,7 +209,7 @@ namespace The590Box
             PREoff.FlatAppearance.MouseOverBackColor = Color.Blue;
             PREoff.Font = new Font("Verdana", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             PREoff.ForeColor = Color.Yellow;
-            PREoff.Location = new Point(252, 0);
+            PREoff.Location = new Point(252, 34);
             PREoff.Name = "PREoff";
             PREoff.Size = new Size(85, 35);
             PREoff.TabIndex = 28;
@@ -224,7 +225,7 @@ namespace The590Box
             PROon.FlatAppearance.MouseOverBackColor = Color.Blue;
             PROon.Font = new Font("Verdana", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             PROon.ForeColor = Color.Yellow;
-            PROon.Location = new Point(252, 34);
+            PROon.Location = new Point(252, 68);
             PROon.Name = "PROon";
             PROon.Size = new Size(85, 35);
             PROon.TabIndex = 29;
@@ -605,12 +606,28 @@ namespace The590Box
             SQLLabel.TabIndex = 0;
             SQLLabel.Text = "SQUELCH";
             // 
+            // MUTE
+            // 
+            MUTE.BackColor = Color.DarkGreen;
+            MUTE.FlatAppearance.BorderColor = Color.White;
+            MUTE.FlatAppearance.MouseDownBackColor = Color.Red;
+            MUTE.FlatAppearance.MouseOverBackColor = Color.Blue;
+            MUTE.Font = new Font("Verdana", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            MUTE.ForeColor = Color.Yellow;
+            MUTE.Location = new Point(252, 0);
+            MUTE.Name = "MUTE";
+            MUTE.Size = new Size(85, 35);
+            MUTE.TabIndex = 63;
+            MUTE.Text = "MUTE";
+            MUTE.UseVisualStyleBackColor = false;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = Color.Black;
             ClientSize = new Size(761, 125);
+            Controls.Add(MUTE);
             Controls.Add(SQLLabel);
             Controls.Add(SQLTextBox);
             Controls.Add(SQLtrackBar);
@@ -701,6 +718,7 @@ namespace The590Box
         private System.Windows.Forms.TrackBar SQLtrackBar;
         private System.Windows.Forms.TextBox SQLTextBox;
         private System.Windows.Forms.Label SQLLabel;
+        private System.Windows.Forms.Button MUTE;
     }
 }
 
