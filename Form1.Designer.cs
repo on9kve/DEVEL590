@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Windows.Forms;
 
 namespace The590Box
 {
@@ -30,44 +31,40 @@ namespace The590Box
         /// </summary>
         private void InitializeComponent()
         {
-            ExtTuneButton = new System.Windows.Forms.Button();
-            USBB = new System.Windows.Forms.Button();
-            LSBB = new System.Windows.Forms.Button();
-            CWB = new System.Windows.Forms.Button();
-            MODE_box = new System.Windows.Forms.TextBox();
-            ANT1B = new System.Windows.Forms.Button();
-            ANT2B = new System.Windows.Forms.Button();
-            ANT3RXB = new System.Windows.Forms.Button();
-            PREoff = new System.Windows.Forms.Button();
-            PROon = new System.Windows.Forms.Button();
-            ANT_box = new System.Windows.Forms.TextBox();
-            IPO_box = new System.Windows.Forms.TextBox();
-            rfGainTrackBar = new System.Windows.Forms.TrackBar();
-            volumeGainTrackBar = new System.Windows.Forms.TrackBar();
-            textBox1 = new System.Windows.Forms.TextBox();
-            textBox2 = new System.Windows.Forms.TextBox();
-            BUSY_box = new System.Windows.Forms.TextBox();
-            pwrControlTrackBar = new System.Windows.Forms.TrackBar();
-            textBox3 = new System.Windows.Forms.TextBox();
-            AMB = new System.Windows.Forms.Button();
-            FMB = new System.Windows.Forms.Button();
-            DIGB = new System.Windows.Forms.Button();
-            IntTune = new System.Windows.Forms.Button();
-            ItuneOn = new System.Windows.Forms.Button();
-            ItuneOff = new System.Windows.Forms.Button();
-            textBox4 = new System.Windows.Forms.TextBox();
-            rfGainLabel = new System.Windows.Forms.Label();
-            volumeGainLabel = new System.Windows.Forms.Label();
-            pwrControlLabel = new System.Windows.Forms.Label();
-            VFO1_box = new System.Windows.Forms.TextBox();
-            VFO2_box = new System.Windows.Forms.TextBox();
-            MENU = new System.Windows.Forms.Button();
-            SQLtrackBar = new System.Windows.Forms.TrackBar();
-            SQLTextBox = new System.Windows.Forms.TextBox();
-            SQLLabel = new System.Windows.Forms.Label();
-            MUTE = new System.Windows.Forms.Button();
-            comPortComboBox = new System.Windows.Forms.ComboBox();
-            connectButton = new System.Windows.Forms.Button();
+            ExtTuneButton = new Button();
+            USBB = new Button();
+            LSBB = new Button();
+            CWB = new Button();
+            ANT1B = new Button();
+            ANT2B = new Button();
+            ANT3RXB = new Button();
+            PREoff = new Button();
+            PROon = new Button();
+            rfGainTrackBar = new TrackBar();
+            volumeGainTrackBar = new TrackBar();
+            textBox1 = new TextBox();
+            textBox2 = new TextBox();
+            BUSY_box = new TextBox();
+            pwrControlTrackBar = new TrackBar();
+            textBox3 = new TextBox();
+            AMB = new Button();
+            FMB = new Button();
+            DIGB = new Button();
+            IntTune = new Button();
+            ItuneOn = new Button();
+            ItuneOff = new Button();
+            rfGainLabel = new Label();
+            volumeGainLabel = new Label();
+            pwrControlLabel = new Label();
+            VFOA_box = new TextBox();
+            VFOB_box = new TextBox();
+            MENU = new Button();
+            SQLtrackBar = new TrackBar();
+            SQLTextBox = new TextBox();
+            SQLLabel = new Label();
+            MUTE = new Button();
+            comPortComboBox = new ComboBox();
+            connectButton = new Button();
             ((System.ComponentModel.ISupportInitialize)rfGainTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)volumeGainTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pwrControlTrackBar).BeginInit();
@@ -134,21 +131,6 @@ namespace The590Box
             CWB.TabIndex = 13;
             CWB.Text = "CW";
             CWB.UseVisualStyleBackColor = false;
-            // 
-            // MODE_box
-            // 
-            MODE_box.BackColor = Color.Black;
-            MODE_box.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            MODE_box.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            MODE_box.ForeColor = Color.Cyan;
-            MODE_box.Location = new Point(336, 103);
-            MODE_box.Margin = new System.Windows.Forms.Padding(0);
-            MODE_box.Name = "MODE_box";
-            MODE_box.Size = new Size(111, 18);
-            MODE_box.TabIndex = 23;
-            MODE_box.TabStop = false;
-            MODE_box.Text = "<MODE>";
-            MODE_box.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // ANT1B
             // 
@@ -225,47 +207,17 @@ namespace The590Box
             PROon.Text = "PRE on";
             PROon.UseVisualStyleBackColor = false;
             // 
-            // ANT_box
-            // 
-            ANT_box.BackColor = Color.Black;
-            ANT_box.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            ANT_box.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            ANT_box.ForeColor = Color.Cyan;
-            ANT_box.Location = new Point(168, 103);
-            ANT_box.Margin = new System.Windows.Forms.Padding(0);
-            ANT_box.Name = "ANT_box";
-            ANT_box.Size = new Size(84, 18);
-            ANT_box.TabIndex = 31;
-            ANT_box.TabStop = false;
-            ANT_box.Text = "<ANT>";
-            ANT_box.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // IPO_box
-            // 
-            IPO_box.BackColor = Color.Black;
-            IPO_box.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            IPO_box.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            IPO_box.ForeColor = Color.Cyan;
-            IPO_box.Location = new Point(252, 103);
-            IPO_box.Margin = new System.Windows.Forms.Padding(0);
-            IPO_box.Name = "IPO_box";
-            IPO_box.Size = new Size(84, 18);
-            IPO_box.TabIndex = 32;
-            IPO_box.TabStop = false;
-            IPO_box.Text = "<PRE>";
-            IPO_box.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
             // rfGainTrackBar
             // 
             rfGainTrackBar.BackColor = Color.DarkGreen;
             rfGainTrackBar.Location = new Point(450, 1);
             rfGainTrackBar.Maximum = 255;
             rfGainTrackBar.Name = "rfGainTrackBar";
-            rfGainTrackBar.Orientation = System.Windows.Forms.Orientation.Vertical;
+            rfGainTrackBar.Orientation = Orientation.Vertical;
             rfGainTrackBar.Size = new Size(45, 102);
             rfGainTrackBar.TabIndex = 42;
             rfGainTrackBar.TickFrequency = 16;
-            rfGainTrackBar.TickStyle = System.Windows.Forms.TickStyle.Both;
+            rfGainTrackBar.TickStyle = TickStyle.Both;
             rfGainTrackBar.Value = 255;
             // 
             // volumeGainTrackBar
@@ -274,60 +226,60 @@ namespace The590Box
             volumeGainTrackBar.Location = new Point(501, 1);
             volumeGainTrackBar.Maximum = 255;
             volumeGainTrackBar.Name = "volumeGainTrackBar";
-            volumeGainTrackBar.Orientation = System.Windows.Forms.Orientation.Vertical;
+            volumeGainTrackBar.Orientation = Orientation.Vertical;
             volumeGainTrackBar.Size = new Size(45, 102);
             volumeGainTrackBar.TabIndex = 43;
             volumeGainTrackBar.TickFrequency = 16;
-            volumeGainTrackBar.TickStyle = System.Windows.Forms.TickStyle.Both;
+            volumeGainTrackBar.TickStyle = TickStyle.Both;
             volumeGainTrackBar.Value = 60;
             // 
             // textBox1
             // 
             textBox1.BackColor = Color.Black;
-            textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            textBox1.BorderStyle = BorderStyle.None;
             textBox1.Font = new Font("Verdana", 8F, FontStyle.Bold);
             textBox1.ForeColor = Color.Cyan;
             textBox1.Location = new Point(452, 106);
-            textBox1.Margin = new System.Windows.Forms.Padding(0);
+            textBox1.Margin = new Padding(0);
             textBox1.Multiline = true;
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(40, 15);
             textBox1.TabIndex = 46;
             textBox1.TabStop = false;
             textBox1.Text = "00";
-            textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            textBox1.TextAlign = HorizontalAlignment.Center;
             textBox1.WordWrap = false;
             // 
             // textBox2
             // 
             textBox2.BackColor = Color.Black;
-            textBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            textBox2.BorderStyle = BorderStyle.None;
             textBox2.Font = new Font("Verdana", 8F, FontStyle.Bold);
             textBox2.ForeColor = Color.Cyan;
             textBox2.Location = new Point(503, 106);
-            textBox2.Margin = new System.Windows.Forms.Padding(0);
+            textBox2.Margin = new Padding(0);
             textBox2.Multiline = true;
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(40, 15);
             textBox2.TabIndex = 47;
             textBox2.TabStop = false;
             textBox2.Text = "00";
-            textBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            textBox2.TextAlign = HorizontalAlignment.Center;
             textBox2.WordWrap = false;
             // 
             // BUSY_box
             // 
             BUSY_box.BackColor = Color.Black;
-            BUSY_box.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            BUSY_box.BorderStyle = BorderStyle.None;
             BUSY_box.ForeColor = Color.FromArgb(64, 64, 64);
             BUSY_box.Location = new Point(160, 107);
-            BUSY_box.Margin = new System.Windows.Forms.Padding(1);
+            BUSY_box.Margin = new Padding(1);
             BUSY_box.Multiline = true;
             BUSY_box.Name = "BUSY_box";
             BUSY_box.Size = new Size(8, 8);
             BUSY_box.TabIndex = 48;
             BUSY_box.Text = "█";
-            BUSY_box.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            BUSY_box.TextAlign = HorizontalAlignment.Center;
             BUSY_box.WordWrap = false;
             // 
             // pwrControlTrackBar
@@ -337,28 +289,28 @@ namespace The590Box
             pwrControlTrackBar.Maximum = 100;
             pwrControlTrackBar.Minimum = 5;
             pwrControlTrackBar.Name = "pwrControlTrackBar";
-            pwrControlTrackBar.Orientation = System.Windows.Forms.Orientation.Vertical;
+            pwrControlTrackBar.Orientation = Orientation.Vertical;
             pwrControlTrackBar.Size = new Size(45, 102);
             pwrControlTrackBar.TabIndex = 44;
             pwrControlTrackBar.TickFrequency = 5;
-            pwrControlTrackBar.TickStyle = System.Windows.Forms.TickStyle.Both;
+            pwrControlTrackBar.TickStyle = TickStyle.Both;
             pwrControlTrackBar.Value = 100;
             // 
             // textBox3
             // 
             textBox3.BackColor = Color.Black;
-            textBox3.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            textBox3.BorderStyle = BorderStyle.None;
             textBox3.Font = new Font("Verdana", 8F, FontStyle.Bold);
             textBox3.ForeColor = Color.Cyan;
             textBox3.Location = new Point(605, 106);
-            textBox3.Margin = new System.Windows.Forms.Padding(0);
+            textBox3.Margin = new Padding(0);
             textBox3.Multiline = true;
             textBox3.Name = "textBox3";
             textBox3.Size = new Size(40, 15);
             textBox3.TabIndex = 45;
             textBox3.TabStop = false;
             textBox3.Text = "100";
-            textBox3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            textBox3.TextAlign = HorizontalAlignment.Center;
             textBox3.WordWrap = false;
             // 
             // AMB
@@ -451,21 +403,6 @@ namespace The590Box
             ItuneOff.Text = "Off";
             ItuneOff.UseVisualStyleBackColor = false;
             // 
-            // textBox4
-            // 
-            textBox4.BackColor = Color.Black;
-            textBox4.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            textBox4.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            textBox4.ForeColor = Color.Cyan;
-            textBox4.Location = new Point(654, 103);
-            textBox4.Margin = new System.Windows.Forms.Padding(0);
-            textBox4.Name = "textBox4";
-            textBox4.Size = new Size(105, 18);
-            textBox4.TabIndex = 58;
-            textBox4.TabStop = false;
-            textBox4.Text = "<INT TUN>";
-            textBox4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
             // rfGainLabel
             // 
             rfGainLabel.AutoSize = true;
@@ -502,35 +439,35 @@ namespace The590Box
             pwrControlLabel.TabIndex = 0;
             pwrControlLabel.Text = "POWER";
             // 
-            // VFO1_box
+            // VFOA_box
             // 
-            VFO1_box.BackColor = Color.DarkGreen;
-            VFO1_box.Font = new Font("Consolas", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            VFO1_box.ForeColor = Color.Yellow;
-            VFO1_box.Location = new Point(2, 1);
-            VFO1_box.Multiline = true;
-            VFO1_box.Name = "VFO1_box";
-            VFO1_box.Size = new Size(166, 33);
-            VFO1_box.TabIndex = 44;
-            VFO1_box.TabStop = false;
-            VFO1_box.Text = "VFO1";
-            VFO1_box.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            VFO1_box.WordWrap = false;
+            VFOA_box.BackColor = Color.DarkGreen;
+            VFOA_box.Font = new Font("Consolas", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            VFOA_box.ForeColor = Color.Yellow;
+            VFOA_box.Location = new Point(2, 1);
+            VFOA_box.Multiline = true;
+            VFOA_box.Name = "VFOA_box";
+            VFOA_box.Size = new Size(166, 33);
+            VFOA_box.TabIndex = 44;
+            VFOA_box.TabStop = false;
+            VFOA_box.Text = "VFOA";
+            VFOA_box.TextAlign = HorizontalAlignment.Center;
+            VFOA_box.WordWrap = false;
             // 
-            // VFO2_box
+            // VFOB_box
             // 
-            VFO2_box.BackColor = Color.DarkBlue;
-            VFO2_box.Font = new Font("Consolas", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            VFO2_box.ForeColor = Color.Yellow;
-            VFO2_box.Location = new Point(2, 36);
-            VFO2_box.Multiline = true;
-            VFO2_box.Name = "VFO2_box";
-            VFO2_box.Size = new Size(166, 33);
-            VFO2_box.TabIndex = 45;
-            VFO2_box.TabStop = false;
-            VFO2_box.Text = "VFO2";
-            VFO2_box.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            VFO2_box.WordWrap = false;
+            VFOB_box.BackColor = Color.DarkBlue;
+            VFOB_box.Font = new Font("Consolas", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            VFOB_box.ForeColor = Color.Yellow;
+            VFOB_box.Location = new Point(2, 36);
+            VFOB_box.Multiline = true;
+            VFOB_box.Name = "VFOB_box";
+            VFOB_box.Size = new Size(166, 33);
+            VFOB_box.TabIndex = 45;
+            VFOB_box.TabStop = false;
+            VFOB_box.Text = "VFOB";
+            VFOB_box.TextAlign = HorizontalAlignment.Center;
+            VFOB_box.WordWrap = false;
             // 
             // MENU
             // 
@@ -553,27 +490,27 @@ namespace The590Box
             SQLtrackBar.Location = new Point(552, 1);
             SQLtrackBar.Maximum = 255;
             SQLtrackBar.Name = "SQLtrackBar";
-            SQLtrackBar.Orientation = System.Windows.Forms.Orientation.Vertical;
+            SQLtrackBar.Orientation = Orientation.Vertical;
             SQLtrackBar.Size = new Size(45, 102);
             SQLtrackBar.TabIndex = 61;
             SQLtrackBar.TickFrequency = 25;
-            SQLtrackBar.TickStyle = System.Windows.Forms.TickStyle.Both;
+            SQLtrackBar.TickStyle = TickStyle.Both;
             // 
             // SQLTextBox
             // 
             SQLTextBox.BackColor = Color.Black;
-            SQLTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            SQLTextBox.BorderStyle = BorderStyle.None;
             SQLTextBox.Font = new Font("Verdana", 8F, FontStyle.Bold);
             SQLTextBox.ForeColor = Color.Cyan;
             SQLTextBox.Location = new Point(554, 106);
-            SQLTextBox.Margin = new System.Windows.Forms.Padding(0);
+            SQLTextBox.Margin = new Padding(0);
             SQLTextBox.Multiline = true;
             SQLTextBox.Name = "SQLTextBox";
             SQLTextBox.Size = new Size(40, 15);
             SQLTextBox.TabIndex = 62;
             SQLTextBox.TabStop = false;
             SQLTextBox.Text = "000";
-            SQLTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            SQLTextBox.TextAlign = HorizontalAlignment.Center;
             SQLTextBox.WordWrap = false;
             // 
             // SQLLabel
@@ -606,8 +543,8 @@ namespace The590Box
             // comPortComboBox
             // 
             comPortComboBox.BackColor = Color.DarkGreen;
-            comPortComboBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            comPortComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            comPortComboBox.DrawMode = DrawMode.OwnerDrawFixed;
+            comPortComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             comPortComboBox.Font = new Font("Verdana", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             comPortComboBox.ForeColor = Color.Yellow;
             comPortComboBox.ItemHeight = 18;
@@ -634,9 +571,9 @@ namespace The590Box
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Black;
-            ClientSize = new Size(761, 158);
+            ClientSize = new Size(941, 158);
             Controls.Add(connectButton);
             Controls.Add(comPortComboBox);
             Controls.Add(MUTE);
@@ -647,7 +584,6 @@ namespace The590Box
             Controls.Add(rfGainLabel);
             Controls.Add(volumeGainLabel);
             Controls.Add(pwrControlLabel);
-            Controls.Add(textBox4);
             Controls.Add(ItuneOff);
             Controls.Add(ItuneOn);
             Controls.Add(IntTune);
@@ -657,18 +593,15 @@ namespace The590Box
             Controls.Add(BUSY_box);
             Controls.Add(textBox2);
             Controls.Add(textBox1);
-            Controls.Add(VFO2_box);
-            Controls.Add(VFO1_box);
+            Controls.Add(VFOB_box);
+            Controls.Add(VFOA_box);
             Controls.Add(volumeGainTrackBar);
             Controls.Add(rfGainTrackBar);
-            Controls.Add(IPO_box);
-            Controls.Add(ANT_box);
             Controls.Add(PROon);
             Controls.Add(PREoff);
             Controls.Add(ANT3RXB);
             Controls.Add(ANT2B);
             Controls.Add(ANT1B);
-            Controls.Add(MODE_box);
             Controls.Add(CWB);
             Controls.Add(LSBB);
             Controls.Add(USBB);
@@ -677,14 +610,14 @@ namespace The590Box
             Controls.Add(textBox3);
             Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             ForeColor = Color.Yellow;
-            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            ImeMode = System.Windows.Forms.ImeMode.Disable;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            ImeMode = ImeMode.Disable;
             Location = new Point(1, 1);
-            Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            Margin = new Padding(3, 4, 3, 4);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "MainForm";
-            Text = "The590Box v 4 - by Kees, ON9KVE";
+            Text = "The590Box v 5 - by Kees, ON9KVE";
             TransparencyKey = Color.Fuchsia;
             ((System.ComponentModel.ISupportInitialize)rfGainTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)volumeGainTrackBar).EndInit();
@@ -700,14 +633,11 @@ namespace The590Box
         private System.Windows.Forms.Button USBB;
         private System.Windows.Forms.Button LSBB;
         private System.Windows.Forms.Button CWB;
-        private System.Windows.Forms.TextBox MODE_box;
         private System.Windows.Forms.Button ANT1B;
         private System.Windows.Forms.Button ANT2B;
         private System.Windows.Forms.Button ANT3RXB;
         private System.Windows.Forms.Button PREoff;
         private System.Windows.Forms.Button PROon;
-        private System.Windows.Forms.TextBox ANT_box;
-        private System.Windows.Forms.TextBox IPO_box;
         private System.Windows.Forms.TrackBar rfGainTrackBar;
         private System.Windows.Forms.TrackBar volumeGainTrackBar;
         private System.Windows.Forms.TrackBar pwrControlTrackBar;
@@ -721,12 +651,11 @@ namespace The590Box
         private System.Windows.Forms.Button IntTune;
         private System.Windows.Forms.Button ItuneOn;
         private System.Windows.Forms.Button ItuneOff;
-        private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.Label rfGainLabel;
         private System.Windows.Forms.Label volumeGainLabel;
         private System.Windows.Forms.Label pwrControlLabel;
-        private System.Windows.Forms.TextBox VFO1_box;
-        private System.Windows.Forms.TextBox VFO2_box;
+        private System.Windows.Forms.TextBox VFOA_box;
+        private System.Windows.Forms.TextBox VFOB_box;
         private System.Windows.Forms.Button MENU;
         private System.Windows.Forms.TrackBar SQLtrackBar;
         private System.Windows.Forms.TextBox SQLTextBox;

@@ -2,7 +2,7 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="The590Box.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="SerialPort" Type="System.String" Scope="User">
+    <Setting Name="LastPort" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="WindowLeft" Type="System.Int32" Scope="User">

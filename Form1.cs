@@ -8,11 +8,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DEVEL590.Properties;
 
 // Code : Kees van Engelen (keesvanengelen@gmail.com)
 // 
-// Version : 4 (02 mrt 26); 
+// Version : 5 (02 mrt 26); 
 // Name    : The590Box Yaesu FTDX101 @ COMx
 
 
@@ -191,29 +190,24 @@ namespace The590Box
         #region ParseXxx response helpers
         private void ParseMode(string r)
         {
-            string d = r.Length >= 3
-                ? r[2] switch { '1' => "LSB", '2' => "USB", '3' => "CW", '4' => "FM", '5' => "AM", _ => "???" }
-                : "???";
-            UpdateTextBox(MODE_box, d);
+            if (r.Length < 3) return;
+            Button? active = r[2] switch { '1' => LSBB, '2' => USBB, '3' => CWB, '4' => FMB, '5' => AMB, _ => null };
+            SetButtonGroup(new[] { USBB, LSBB, CWB, AMB, FMB }, active);
         }
 
         private void ParseAnt(string r)
         {
-            string d = "???";
-            if (r.Length >= 4)
-            {
-                string x = r.Substring(2, 1), y = r.Substring(3, 1);
-                d = y == "1" ? "RX ANT" : x switch { "1" => "ANT 1", "2" => "ANT 2", _ => "???" };
-            }
-            UpdateTextBox(ANT_box, d);
+            if (r.Length < 4) return;
+            string x = r.Substring(2, 1), y = r.Substring(3, 1);
+            Button? active = y == "1" ? ANT3RXB : x switch { "1" => ANT1B, "2" => ANT2B, _ => null };
+            SetButtonGroup(new[] { ANT1B, ANT2B, ANT3RXB }, active);
         }
 
         private void ParsePreamp(string r)
         {
-            string d = r.Length >= 3
-                ? r[2] switch { '0' => "AMP off", '1' => "AMP on", _ => "???" }
-                : "???";
-            UpdateTextBox(IPO_box, d);
+            if (r.Length < 3) return;
+            bool on = r[2] == '1';
+            SetButtonGroup(new[] { PREoff, PROon }, on ? PROon : PREoff);
         }
 
         private void ParseMenu(string r)
@@ -276,28 +270,26 @@ namespace The590Box
             }
         }
 
-        private void ParseVfo1(string r)
+        private void ParseVfoA(string r)
         {
             string d = (r.Length >= 3 && long.TryParse(r.Substring(2, r.Length - 3), out long hz))
                 ? $"{hz / 100000.0,9:F3}" : "???";
-            UpdateTextBox(VFO1_box, $"VFO1:{d} MHz");
+            UpdateTextBox(VFOA_box, $"VFOA:{d} MHz");
         }
 
-        private void ParseVfo2(string r)
+        private void ParseVfoB(string r)
         {
             string d = (r.Length >= 3 && long.TryParse(r.Substring(2, r.Length - 3), out long hz))
                 ? $"{hz / 100000.0,9:F3}" : "???";
-            UpdateTextBox(VFO2_box, $"VFO2:{d} MHz");
+            UpdateTextBox(VFOB_box, $"VFOB:{d} MHz");
         }
 
         private void ParseTuner(string r)
         {
-            if (r.Length < 4) { UpdateTextBox(textBox4, "      "); return; }
+            if (r.Length < 4) { SetButtonGroup(new[] { ItuneOn, ItuneOff }, ItuneOff); return; }
             string x = r.Substring(2, 1), y = r.Substring(3, 1);
-            string d = (x == "1" || y == "1")
-                ? (x == "1" ? "R" : " ") + "<AT>" + (y == "1" ? "T" : " ")
-                : "      ";
-            UpdateTextBox(textBox4, d);
+            bool tunerOn = x == "1" || y == "1";
+            SetButtonGroup(new[] { ItuneOn, ItuneOff }, tunerOn ? ItuneOn : ItuneOff);
         }
         #endregion
 
@@ -305,6 +297,13 @@ namespace The590Box
         {
             if (btn.InvokeRequired) { btn.BeginInvoke((Action)(() => SetButtonActive(btn, active))); return; }
             btn.BackColor = active ? Color.DarkRed : Color.DarkGreen;
+        }
+
+        private void SetButtonGroup(Button[] group, Button? active)
+        {
+            if (group[0].InvokeRequired) { group[0].BeginInvoke((Action)(() => SetButtonGroup(group, active))); return; }
+            foreach (var btn in group)
+                btn.BackColor = btn == active ? Color.DarkRed : Color.DarkGreen;
         }
 
         private void PollTimer_Tick(object sender, EventArgs e)
@@ -334,8 +333,8 @@ namespace The590Box
             else if (cmd == CMD_READ_VOLUME)  ParseVolume(response);
             else if (cmd == CMD_READ_POWER)   ParsePower(response);
             else if (cmd == CMD_READ_SQUELCH) ParseSquelch(response);
-            else if (cmd == CMD_READ_VFO1)    ParseVfo1(response);
-            else if (cmd == CMD_READ_VFO2)    ParseVfo2(response);
+            else if (cmd == CMD_READ_VFO1)    ParseVfoA(response);
+            else if (cmd == CMD_READ_VFO2)    ParseVfoB(response);
             else if (cmd == CMD_READ_TUNER)   ParseTuner(response);
 
             string blok = "█";
@@ -505,7 +504,7 @@ namespace The590Box
             if (ports.Length > 0)
                 comPortComboBox.Items.AddRange(ports);
 
-            string preferred = current ?? Settings.Default.LastPort;
+            string preferred = current ?? UserConfig.Default.LastPort;
             int idx = Array.IndexOf(ports, preferred);
             comPortComboBox.SelectedIndex = idx >= 0 ? idx : (ports.Length > 0 ? 0 : -1);
         }
@@ -551,8 +550,8 @@ namespace The590Box
                         if (IsHandleCreated)
                             Invoke((Action)(() =>
                             {
-                                Settings.Default.LastPort = portName;
-                                Settings.Default.Save();
+                                UserConfig.Default.LastPort = portName;
+                                UserConfig.Default.Save();
                                 this.Text = $"The590Box v 3 - by Kees, ON9KVE - {portName}";
                                 UpdateConnectButtonState(true);
                                 ExtTuneButton.Enabled = true;
@@ -646,39 +645,30 @@ namespace The590Box
         // Add this method to save window position
         private void SaveWindowPosition()
         {
-            // Only save position, not size (since form is now fixed-size)
-            Settings.Default.WindowLeft = this.Left;
-            Settings.Default.WindowTop = this.Top;
-            Settings.Default.IsPositionSaved = true; // Mark that we have saved a position
-            Settings.Default.Save();
+            UserConfig.Default.WindowLeft     = this.Left;
+            UserConfig.Default.WindowTop      = this.Top;
+            UserConfig.Default.IsPositionSaved = true;
+            UserConfig.Default.Save();
         }
 
-        // Add this method to restore window position
         private void RestoreWindowPosition()
         {
-            // Check if a position has ever been saved. This is more reliable than checking coordinates.
-            if (!Settings.Default.IsPositionSaved)
+            if (!UserConfig.Default.IsPositionSaved)
             {
-                // If not, this is the first run, so center the form.
                 this.StartPosition = FormStartPosition.CenterScreen;
                 return;
             }
 
-            // Create a rectangle with the saved position and current (fixed) size
-            var savedBounds = new Rectangle(Settings.Default.WindowLeft, Settings.Default.WindowTop, this.Width, this.Height);
-
-            // Check if the saved position is visible on any of the connected screens
+            var savedBounds = new Rectangle(UserConfig.Default.WindowLeft, UserConfig.Default.WindowTop, this.Width, this.Height);
             bool isVisible = Screen.AllScreens.Any(screen => screen.WorkingArea.IntersectsWith(savedBounds));
 
             if (isVisible)
             {
-                // If it's visible, move the form to the saved location
                 this.StartPosition = FormStartPosition.Manual;
-                this.Location = new Point(Settings.Default.WindowLeft, Settings.Default.WindowTop);
+                this.Location = new Point(UserConfig.Default.WindowLeft, UserConfig.Default.WindowTop);
             }
             else
             {
-                // If not (e.g., the monitor was disconnected), center the form to prevent it from opening off-screen
                 this.StartPosition = FormStartPosition.CenterScreen;
             }
         }
