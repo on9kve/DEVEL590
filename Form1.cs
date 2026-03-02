@@ -12,7 +12,7 @@ using DEVEL590.Properties;
 
 // Code : Kees van Engelen (keesvanengelen@gmail.com)
 // 
-// Version : 3 (15 feb 26); 
+// Version : 4 (02 mrt 26); 
 // Name    : The590Box Yaesu FTDX101 @ COMx
 
 
@@ -58,7 +58,7 @@ namespace The590Box
         private const string CMD_SET_VOL_MUTE   = "AG0000;";
         #endregion
 
-        public readonly SerialPort Serial_Port;
+        public SerialPort? Serial_Port;
         private readonly object serialLock = new();
 
         // Poll timer
@@ -103,52 +103,14 @@ namespace The590Box
             InitializeComponent();
             InitializeTrackBarEvents();
 
-            // Make form fixed size (non-resizable)
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
 
-            // Restore position before showing the form
             RestoreWindowPosition();
 
-            string portName = SelectSerialPort();
-
-            // Update form title with selected COM port
-            this.Text = $"The590Box v 3 - by Kees, ON9KVE - {portName}";
-
-            Serial_Port = new SerialPort(portName, 115200, Parity.None, 8, StopBits.One)
-            {
-                Handshake    = Handshake.None,
-                RtsEnable    = true,
-                DtrEnable    = true,
-                ReadTimeout  = 500,
-                WriteTimeout = 500
-            };
-
-            // Open the serial port on a background thread so UI initialization isn't blocked.
+            PopulateComPorts();
+            UpdateConnectButtonState(false);
             ExtTuneButton.Enabled = false;
-
-            Task.Run(() =>
-            {
-                try
-                {
-                    Serial_Port.Open();
-                    ReadRadioStatus();
-                    if (IsHandleCreated)
-                        Invoke((Action)(() =>
-                        {
-                            ExtTuneButton.Enabled = true;
-                            ExtTuneButton.ForeColor = Color.Yellow;
-                            pollTimer.Start();
-                        }));
-                }
-                catch (Exception ex)
-                {
-                    if (IsHandleCreated)
-                        Invoke((Action)(() =>
-                            MessageBox.Show(this, "Failed to open serial port: " + ex.Message,
-                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)));
-                }
-            });
         }
 
         private void InitializeTrackBarEvents()
@@ -206,6 +168,11 @@ namespace The590Box
             volumeGainTrackBar.ValueChanged  += VolumeGainTrackBar_ValueChanged;
             pwrControlTrackBar.ValueChanged  += PwrControlTrackBar_ValueChanged;
             SQLtrackBar.ValueChanged         += SQLtrackBar_ValueChanged;
+
+            // COM port selector + connect button
+            comPortComboBox.DrawItem += ComboBox_DrawItem;
+            comPortComboBox.DropDown += (s, e) => PopulateComPorts();
+            connectButton.Click      += ConnectButton_Click;
         }
 
         private void UpdateTextBox(TextBox tb, string text, Color? foreColor = null)
@@ -342,7 +309,7 @@ namespace The590Box
 
         private void PollTimer_Tick(object sender, EventArgs e)
         {
-            if (!Serial_Port.IsOpen) return;
+            if (Serial_Port == null || !Serial_Port.IsOpen) return;
             string cmd = pollCmds[pollIndex];
             pollIndex = (pollIndex + 1) % pollCmds.Length;
             string response;
@@ -387,7 +354,7 @@ namespace The590Box
         {
             foreach (string cmd in pollCmds)
             {
-                if (!Serial_Port.IsOpen) return;
+                if (Serial_Port == null || !Serial_Port.IsOpen) return;
                 IssueCmd(cmd);
                 Thread.Sleep(80);
             }
@@ -395,6 +362,7 @@ namespace The590Box
 
         private void IssueCmd(string cmd)
         {
+            if (Serial_Port == null || !Serial_Port.IsOpen) return;
             try
             {
                 lock (serialLock)
@@ -458,13 +426,13 @@ namespace The590Box
 
         private void ComboBox_DrawItem(object sender, DrawItemEventArgs e)
         {
-            if (e.Index < 0) return;
             var cb = (ComboBox)sender;
             bool selected = (e.State & DrawItemState.Selected) != 0;
             using var bgBrush = new SolidBrush(selected ? Color.Green : Color.DarkGreen);
             using var fgBrush = new SolidBrush(cb.ForeColor);
             e.Graphics.FillRectangle(bgBrush, e.Bounds);
-            e.Graphics.DrawString(cb.Items[e.Index]?.ToString(), e.Font, fgBrush, e.Bounds);
+            if (e.Index >= 0)
+                e.Graphics.DrawString(cb.Items[e.Index]?.ToString(), e.Font, fgBrush, e.Bounds);
         }
 
 
@@ -524,107 +492,85 @@ namespace The590Box
         {
             IssueCmd(CMD_SET_TUNER_OFF); // Turn internal tuner OFF
         }
-        private string SelectSerialPort()
+        private void PopulateComPorts()
         {
-            try
+            string? current = comPortComboBox.SelectedItem as string;
+
+            string[] ports = SerialPort.GetPortNames()
+                .Where(p => p.StartsWith("COM") && int.TryParse(p.Substring(3), out int n) && n >= 0 && n <= 20)
+                .OrderBy(p => int.Parse(p.Substring(3)))
+                .ToArray();
+
+            comPortComboBox.Items.Clear();
+            if (ports.Length > 0)
+                comPortComboBox.Items.AddRange(ports);
+
+            string preferred = current ?? Settings.Default.LastPort;
+            int idx = Array.IndexOf(ports, preferred);
+            comPortComboBox.SelectedIndex = idx >= 0 ? idx : (ports.Length > 0 ? 0 : -1);
+        }
+
+        private void UpdateConnectButtonState(bool connected)
+        {
+            connectButton.Text      = connected ? "Disconnect" : "Connect";
+            connectButton.BackColor = connected ? Color.DarkRed  : Color.DarkGreen;
+            comPortComboBox.Enabled = !connected;
+        }
+
+        private void ConnectButton_Click(object sender, EventArgs e)
+        {
+            if (Serial_Port?.IsOpen == true)
             {
-                string[] allPorts = SerialPort.GetPortNames();
-                
-                // Filter to COM0-COM20
-                string[] ports = allPorts
-                    .Where(p => p.StartsWith("COM") && int.TryParse(p.Substring(3), out int portNum) && portNum >= 0 && portNum <= 20)
-                    .OrderBy(p => int.Parse(p.Substring(3)))
-                    .ToArray();
-                
-                if (ports.Length == 0)
-                {
-                    MessageBox.Show("No serial ports (COM0-COM20) found!", "The590Box - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return "COM4";
-                }
-                
-                if (ports.Length == 1)
-                {
-                    string selectedPort = ports[0];
-                    Settings.Default.LastPort = selectedPort;
-                    Settings.Default.Save();
-                    MessageBox.Show($"Using port: {selectedPort}", "The590Box - Serial Port", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return selectedPort;
-                }
-                
-                // Multiple ports - ALWAYS show selection dialog
-                using (var form = new Form())
-                {
-                    form.Text = "The590Box - Select Serial Port";  // Changed this line
-                    form.Width = 250;
-                    form.Height = 150;
-                    form.StartPosition = FormStartPosition.CenterScreen;
-                    form.FormBorderStyle = FormBorderStyle.FixedDialog;
-                    form.MaximizeBox = false;
-                    form.MinimizeBox = false;
-                    
-                    var label = new Label 
-                    { 
-                        Text = "Available Ports (COM0-COM20):", 
-                        Dock = DockStyle.Top, 
-                        Height = 25, 
-                        Padding = new Padding(10, 5, 10, 0)
-                    };
-                    
-                    var combo = new ComboBox
-                    {
-                        Dock = DockStyle.Top,
-                        DropDownStyle = ComboBoxStyle.DropDownList,
-                        Height = 30,
-                        DrawMode = DrawMode.OwnerDrawFixed,
-                        BackColor = Color.DarkGreen,
-                        ForeColor = Color.Yellow
-                    };
-                    combo.DrawItem += ComboBox_DrawItem;
-
-                    // Add items directly instead of using DataSource
-                    combo.Items.AddRange(ports);
-
-                    // Pre-select the saved port
-                    string savedPort = Settings.Default.LastPort;
-                    int savedIndex = System.Array.IndexOf(ports, savedPort);
-                    
-                    if (savedIndex >= 0)
-                    {
-                        combo.SelectedIndex = savedIndex;
-                    }
-                    else
-                    {
-                        combo.SelectedIndex = 0;
-                    }
-                    
-                    var btnOK = new Button 
-                    { 
-                        Text = "OK", 
-                        Dock = DockStyle.Bottom,
-                        Height = 40,
-                        DialogResult = DialogResult.OK
-                    };
-                    
-                    form.Controls.Add(btnOK);
-                    form.Controls.Add(combo);
-                    form.Controls.Add(label);
-                    form.AcceptButton = btnOK;
-                    
-                    if (form.ShowDialog() == DialogResult.OK)
-                    {
-                        string selectedPort = (string)combo.SelectedItem;
-                        Settings.Default.LastPort = selectedPort;
-                        Settings.Default.Save();
-                        return selectedPort;
-                    }
-                    
-                    return "COM4";
-                }
+                pollTimer.Stop();
+                try { Serial_Port.Close(); } catch { }
+                UpdateConnectButtonState(false);
+                ExtTuneButton.Enabled = false;
+                this.Text = "The590Box v 3 - by Kees, ON9KVE";
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Error: {ex.Message}", "The590Box - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return "COM4";
+                if (comPortComboBox.SelectedItem is not string portName) return;
+
+                Serial_Port?.Dispose();
+                Serial_Port = new SerialPort(portName, 115200, Parity.None, 8, StopBits.One)
+                {
+                    Handshake    = Handshake.None,
+                    RtsEnable    = true,
+                    DtrEnable    = true,
+                    ReadTimeout  = 500,
+                    WriteTimeout = 500
+                };
+
+                connectButton.Enabled = false;
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        Serial_Port.Open();
+                        ReadRadioStatus();
+                        if (IsHandleCreated)
+                            Invoke((Action)(() =>
+                            {
+                                Settings.Default.LastPort = portName;
+                                Settings.Default.Save();
+                                this.Text = $"The590Box v 3 - by Kees, ON9KVE - {portName}";
+                                UpdateConnectButtonState(true);
+                                ExtTuneButton.Enabled = true;
+                                connectButton.Enabled = true;
+                                pollTimer.Start();
+                            }));
+                    }
+                    catch (Exception ex)
+                    {
+                        if (IsHandleCreated)
+                            Invoke((Action)(() =>
+                            {
+                                connectButton.Enabled = true;
+                                MessageBox.Show(this, "Failed to open serial port: " + ex.Message,
+                                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }));
+                    }
+                });
             }
         }
 
