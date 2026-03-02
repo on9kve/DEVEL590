@@ -66,6 +66,8 @@ namespace The590Box
             SQLTextBox = new System.Windows.Forms.TextBox();
             SQLLabel = new System.Windows.Forms.Label();
             MUTE = new System.Windows.Forms.Button();
+            comPortComboBox = new System.Windows.Forms.ComboBox();
+            connectButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)rfGainTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)volumeGainTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pwrControlTrackBar).BeginInit();
@@ -601,12 +603,42 @@ namespace The590Box
             MUTE.Text = "MUTE";
             MUTE.UseVisualStyleBackColor = false;
             // 
+            // comPortComboBox
+            // 
+            comPortComboBox.BackColor = Color.DarkGreen;
+            comPortComboBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            comPortComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            comPortComboBox.Font = new Font("Verdana", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            comPortComboBox.ForeColor = Color.Yellow;
+            comPortComboBox.ItemHeight = 18;
+            comPortComboBox.Location = new Point(2, 128);
+            comPortComboBox.Name = "comPortComboBox";
+            comPortComboBox.Size = new Size(130, 24);
+            comPortComboBox.TabIndex = 64;
+            // 
+            // connectButton
+            // 
+            connectButton.BackColor = Color.DarkGreen;
+            connectButton.FlatAppearance.BorderColor = Color.White;
+            connectButton.FlatAppearance.MouseDownBackColor = Color.Red;
+            connectButton.FlatAppearance.MouseOverBackColor = Color.Blue;
+            connectButton.Font = new Font("Verdana", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            connectButton.ForeColor = Color.Yellow;
+            connectButton.Location = new Point(138, 126);
+            connectButton.Name = "connectButton";
+            connectButton.Size = new Size(120, 30);
+            connectButton.TabIndex = 65;
+            connectButton.Text = "Connect";
+            connectButton.UseVisualStyleBackColor = false;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = Color.Black;
-            ClientSize = new Size(761, 125);
+            ClientSize = new Size(761, 158);
+            Controls.Add(connectButton);
+            Controls.Add(comPortComboBox);
             Controls.Add(MUTE);
             Controls.Add(SQLLabel);
             Controls.Add(SQLTextBox);
@@ -652,6 +684,7 @@ namespace The590Box
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "MainForm";
+            Text = "The590Box v 4 - by Kees, ON9KVE";
             TransparencyKey = Color.Fuchsia;
             ((System.ComponentModel.ISupportInitialize)rfGainTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)volumeGainTrackBar).EndInit();
@@ -699,6 +732,8 @@ namespace The590Box
         private System.Windows.Forms.TextBox SQLTextBox;
         private System.Windows.Forms.Label SQLLabel;
         private System.Windows.Forms.Button MUTE;
+        private System.Windows.Forms.ComboBox comPortComboBox;
+        private System.Windows.Forms.Button connectButton;
     }
 }
 
