@@ -702,6 +702,7 @@ namespace The590Box
             Name = "MainForm";
             Text = "The590Box v 5 - by Kees, ON9KVE";
             TransparencyKey = Color.Fuchsia;
+            Load += MainForm_Load;
             ((System.ComponentModel.ISupportInitialize)rfGainTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)volumeGainTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)pwrControlTrackBar).EndInit();

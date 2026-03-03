@@ -20,41 +20,41 @@ namespace The590Box
     public partial class MainForm : Form
     {
         #region Radio Commands — Yaesu FTDX-101 CAT
-        private const string CMD_READ_MODE      = "MD;";
-        private const string CMD_READ_ANT       = "AN;";
-        private const string CMD_READ_PREAMP    = "PA;";
-        private const string CMD_READ_MENU      = "MF;";
-        private const string CMD_READ_DATA      = "DA;";
-        private const string CMD_READ_RFGAIN    = "RG;";
-        private const string CMD_READ_VOLUME    = "AG0;";
-        private const string CMD_READ_POWER     = "PC;";
-        private const string CMD_READ_SQUELCH   = "SQ0;";
-        private const string CMD_READ_VFO1      = "FA;";
-        private const string CMD_READ_VFO2      = "FB;";
-        private const string CMD_READ_TUNER     = "AC;";
+        private const string CMD_READ_MODE = "MD;";
+        private const string CMD_READ_ANT = "AN;";
+        private const string CMD_READ_PREAMP = "PA;";
+        private const string CMD_READ_MENU = "MF;";
+        private const string CMD_READ_DATA = "DA;";
+        private const string CMD_READ_RFGAIN = "RG;";
+        private const string CMD_READ_VOLUME = "AG0;";
+        private const string CMD_READ_POWER = "PC;";
+        private const string CMD_READ_SQUELCH = "SQ0;";
+        private const string CMD_READ_VFO1 = "FA;";
+        private const string CMD_READ_VFO2 = "FB;";
+        private const string CMD_READ_TUNER = "AC;";
 
-        private const string CMD_SET_TX         = "TX2;";
-        private const string CMD_SET_RX         = "RX;";
-        private const string CMD_SET_MODE_USB   = "MD2;";
-        private const string CMD_SET_MODE_LSB   = "MD1;";
-        private const string CMD_SET_MODE_CW    = "MD3;";
-        private const string CMD_SET_MODE_FM    = "MD4;";
-        private const string CMD_SET_MODE_AM    = "MD5;";
-        private const string CMD_SET_MODE_DIG   = "MD0C;";
-        private const string CMD_SET_ANT1       = "AN199;";
-        private const string CMD_SET_ANT2       = "AN299;";
-        private const string CMD_SET_RXANT_ON   = "AN919;";
-        private const string CMD_SET_RXANT_OFF  = "AN909;";
+        private const string CMD_SET_TX = "TX2;";
+        private const string CMD_SET_RX = "RX;";
+        private const string CMD_SET_MODE_USB = "MD2;";
+        private const string CMD_SET_MODE_LSB = "MD1;";
+        private const string CMD_SET_MODE_CW = "MD3;";
+        private const string CMD_SET_MODE_FM = "MD4;";
+        private const string CMD_SET_MODE_AM = "MD5;";
+        private const string CMD_SET_MODE_DIG = "MD0C;";
+        private const string CMD_SET_ANT1 = "AN199;";
+        private const string CMD_SET_ANT2 = "AN299;";
+        private const string CMD_SET_RXANT_ON = "AN919;";
+        private const string CMD_SET_RXANT_OFF = "AN909;";
         private const string CMD_SET_PREAMP_OFF = "PA0;";
-        private const string CMD_SET_PREAMP_ON  = "PA1;";
-        private const string CMD_SET_TUNER_OFF  = "AC000;";
-        private const string CMD_SET_TUNER_ON   = "AC110;";
+        private const string CMD_SET_PREAMP_ON = "PA1;";
+        private const string CMD_SET_TUNER_OFF = "AC000;";
+        private const string CMD_SET_TUNER_ON = "AC110;";
         private const string CMD_SET_TUNER_TUNE = "AC111;";
-        private const string CMD_SET_MENU_A     = "MF0;";
-        private const string CMD_SET_MENU_B     = "MF1;";
-        private const string CMD_SET_DATA_OFF   = "DA0;";
-        private const string CMD_SET_DATA_ON    = "DA1;";
-        private const string CMD_SET_VOL_MUTE   = "AG0000;";
+        private const string CMD_SET_MENU_A = "MF0;";
+        private const string CMD_SET_MENU_B = "MF1;";
+        private const string CMD_SET_DATA_OFF = "DA0;";
+        private const string CMD_SET_DATA_ON = "DA1;";
+        private const string CMD_SET_VOL_MUTE = "AG0000;";
         #endregion
 
         public SerialPort? Serial_Port;
@@ -86,15 +86,15 @@ namespace The590Box
         // Radio update flag
         private bool isUpdatingFromRadio = false;
 
-        public string mode, temp, Data,DataB, DATABD, Dspant, DspantD,
-             FColorB, Pstr, Mode, ModeD,Dspipo, DspipoD, SButton, DScopspan, Bar = "";
-        public decimal  Dsppodnum, SecondNum;
+        public string mode, temp, Data, DataB, DATABD, Dspant, DspantD,
+             FColorB, Pstr, Mode, ModeD, Dspipo, DspipoD, SButton, DScopspan, Bar = "";
+        public decimal Dsppodnum, SecondNum;
 
         // Add a field to track the RX antenna state
         private bool rxAntennaOn = false;
         private bool dataOn = false; // Tracks the current DATA state
         private bool menuA = true; // Tracks the current MENU state
-  //      private bool isRxAntennaOff = false;
+                                   //      private bool isRxAntennaOff = false;
         private bool muted = false;
         private int savedVolume = 0;
         public MainForm()
@@ -115,63 +115,63 @@ namespace The590Box
         private void InitializeTrackBarEvents()
         {
             // Timers
-            pollTimer.Interval         = 80;
-            pollTimer.Tick            += PollTimer_Tick;
+            pollTimer.Interval = 80;
+            pollTimer.Tick += PollTimer_Tick;
             sliderDebounceTimer.Interval = 150;
-            sliderDebounceTimer.Tick  += SliderDebounceTimer_Tick;
+            sliderDebounceTimer.Tick += SliderDebounceTimer_Tick;
 
             // Form
             this.FormClosing += MainForm_FormClosing;
 
             // ExtTuner button appearance + events
-            ExtTuneButton.BackColor                        = Color.DarkGreen;
-            ExtTuneButton.ForeColor                        = Color.Yellow;
-            ExtTuneButton.FlatAppearance.BorderSize        = 0;
+            ExtTuneButton.BackColor = Color.DarkGreen;
+            ExtTuneButton.ForeColor = Color.Yellow;
+            ExtTuneButton.FlatAppearance.BorderSize = 0;
             ExtTuneButton.FlatAppearance.MouseDownBackColor = Color.Red;
             ExtTuneButton.FlatAppearance.MouseOverBackColor = Color.Blue;
-            ExtTuneButton.FlatAppearance.BorderColor       = Color.White;
-            ExtTuneButton.MouseDown  += TuneButton_MouseDown;
-            ExtTuneButton.MouseUp    += TuneButton_MouseUp;
+            ExtTuneButton.FlatAppearance.BorderColor = Color.White;
+            ExtTuneButton.MouseDown += TuneButton_MouseDown;
+            ExtTuneButton.MouseUp += TuneButton_MouseUp;
             ExtTuneButton.MouseEnter += TuneButton_MouseEnter;
             ExtTuneButton.MouseLeave += TuneButton_MouseLeave;
-            ExtTuneButton.Paint      += TuneButton_Paint;
+            ExtTuneButton.Paint += TuneButton_Paint;
 
             // Mode buttons
-            USBB.MouseClick  += USB_click;
-            LSBB.MouseClick  += LSB_click;
-            CWB.MouseClick   += CW_click;
-            AMB.MouseClick   += AM_click;
-            FMB.MouseClick   += FM_click;
-            DIGB.MouseClick  += DIGB_click;
+            USBB.MouseClick += USB_click;
+            LSBB.MouseClick += LSB_click;
+            CWB.MouseClick += CW_click;
+            AMB.MouseClick += AM_click;
+            FMB.MouseClick += FM_click;
+            DIGB.MouseClick += DIGB_click;
 
             // Antenna buttons
-            ANT1B.MouseClick   += ANT1B_click;
-            ANT2B.MouseClick   += ANT2B_click;
+            ANT1B.MouseClick += ANT1B_click;
+            ANT2B.MouseClick += ANT2B_click;
             ANT3RXB.MouseClick += ANT3RXB_click;
 
             // Preamp buttons
             PREoff.MouseClick += PREoff_click;
-            PROon.MouseClick  += PROon_click;
+            PROon.MouseClick += PROon_click;
 
             // Tuner buttons
-            IntTune.Click  += IntTune_Click;
-            ItuneOn.Click  += ItuneOn_Click;
+            IntTune.Click += IntTune_Click;
+            ItuneOn.Click += ItuneOn_Click;
             ItuneOff.Click += ItuneOff_Click;
 
             // Menu + Mute
             MENU.MouseClick += MENU_click;
-            MUTE.Click      += MuteButton_Click;
+            MUTE.Click += MuteButton_Click;
 
             // Sliders
-            rfGainTrackBar.ValueChanged      += RfGainTrackBar_ValueChanged;
-            volumeGainTrackBar.ValueChanged  += VolumeGainTrackBar_ValueChanged;
-            pwrControlTrackBar.ValueChanged  += PwrControlTrackBar_ValueChanged;
-            SQLtrackBar.ValueChanged         += SQLtrackBar_ValueChanged;
+            rfGainTrackBar.ValueChanged += RfGainTrackBar_ValueChanged;
+            volumeGainTrackBar.ValueChanged += VolumeGainTrackBar_ValueChanged;
+            pwrControlTrackBar.ValueChanged += PwrControlTrackBar_ValueChanged;
+            SQLtrackBar.ValueChanged += SQLtrackBar_ValueChanged;
 
             // COM port selector + connect button
             comPortComboBox.DrawItem += ComboBox_DrawItem;
             comPortComboBox.DropDown += (s, e) => PopulateComPorts();
-            connectButton.Click      += ConnectButton_Click;
+            connectButton.Click += ConnectButton_Click;
         }
 
         private void UpdateTextBox(TextBox tb, string text, Color? foreColor = null)
@@ -324,18 +324,18 @@ namespace The590Box
             }
             catch { return; }
 
-            if      (cmd == CMD_READ_MODE)    ParseMode(response);
-            else if (cmd == CMD_READ_ANT)     ParseAnt(response);
-            else if (cmd == CMD_READ_PREAMP)  ParsePreamp(response);
-            else if (cmd == CMD_READ_MENU)    ParseMenu(response);
-            else if (cmd == CMD_READ_DATA)    ParseData(response);
-            else if (cmd == CMD_READ_RFGAIN)  ParseRfGain(response);
-            else if (cmd == CMD_READ_VOLUME)  ParseVolume(response);
-            else if (cmd == CMD_READ_POWER)   ParsePower(response);
+            if (cmd == CMD_READ_MODE) ParseMode(response);
+            else if (cmd == CMD_READ_ANT) ParseAnt(response);
+            else if (cmd == CMD_READ_PREAMP) ParsePreamp(response);
+            else if (cmd == CMD_READ_MENU) ParseMenu(response);
+            else if (cmd == CMD_READ_DATA) ParseData(response);
+            else if (cmd == CMD_READ_RFGAIN) ParseRfGain(response);
+            else if (cmd == CMD_READ_VOLUME) ParseVolume(response);
+            else if (cmd == CMD_READ_POWER) ParsePower(response);
             else if (cmd == CMD_READ_SQUELCH) ParseSquelch(response);
-            else if (cmd == CMD_READ_VFO1)    ParseVfoA(response);
-            else if (cmd == CMD_READ_VFO2)    ParseVfoB(response);
-            else if (cmd == CMD_READ_TUNER)   ParseTuner(response);
+            else if (cmd == CMD_READ_VFO1) ParseVfoA(response);
+            else if (cmd == CMD_READ_VFO2) ParseVfoB(response);
+            else if (cmd == CMD_READ_TUNER) ParseTuner(response);
 
             string blok = "█";
             UpdateTextBox(BUSY_box, BUSY_box.Text == blok ? " " : blok);
@@ -511,8 +511,8 @@ namespace The590Box
 
         private void UpdateConnectButtonState(bool connected)
         {
-            connectButton.Text      = connected ? "Disconnect" : "Connect";
-            connectButton.BackColor = connected ? Color.DarkRed  : Color.DarkGreen;
+            connectButton.Text = connected ? "Disconnect" : "Connect";
+            connectButton.BackColor = connected ? Color.DarkRed : Color.DarkGreen;
             comPortComboBox.Enabled = !connected;
         }
 
@@ -533,10 +533,10 @@ namespace The590Box
                 Serial_Port?.Dispose();
                 Serial_Port = new SerialPort(portName, 115200, Parity.None, 8, StopBits.One)
                 {
-                    Handshake    = Handshake.None,
-                    RtsEnable    = true,
-                    DtrEnable    = true,
-                    ReadTimeout  = 500,
+                    Handshake = Handshake.None,
+                    RtsEnable = true,
+                    DtrEnable = true,
+                    ReadTimeout = 500,
                     WriteTimeout = 500
                 };
 
@@ -645,8 +645,8 @@ namespace The590Box
         // Add this method to save window position
         private void SaveWindowPosition()
         {
-            UserConfig.Default.WindowLeft     = this.Left;
-            UserConfig.Default.WindowTop      = this.Top;
+            UserConfig.Default.WindowLeft = this.Left;
+            UserConfig.Default.WindowTop = this.Top;
             UserConfig.Default.IsPositionSaved = true;
             UserConfig.Default.Save();
         }
@@ -671,6 +671,11 @@ namespace The590Box
             {
                 this.StartPosition = FormStartPosition.CenterScreen;
             }
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
