@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 // Code : Kees van Engelen (keesvanengelen@gmail.com)
 // 
-// Version : 7c (03 mrt 26); 
+// Version : 8 RC (03 mrt 26); 
 // Name    : The590Box 
 
 
@@ -106,6 +106,7 @@ namespace The590Box
         private bool menuA = true; // Tracks the current MENU state
         private bool vfoB = false;   // false = VFO-A active, true = VFO-B active
         private long currentVfoAHz = 0; // Current VFO-A frequency in 10 Hz units
+        private long currentVfoBHz = 0; // Current VFO-B frequency in 10 Hz units
         private static readonly long[] StepValues = { 10, 50, 100, 500, 900 }; // 100 Hz, 500 Hz, 1 kHz, 5 kHz, 9 kHz
                                    //      private bool isRxAntennaOff = false;
         private bool muted = false;
@@ -303,14 +304,25 @@ namespace The590Box
             if (!long.TryParse(r.Substring(2, r.Length - 3), out long hz)) return;
             currentVfoAHz = hz;
             UpdateTextBox(VFOA_box, FormatFrequency(hz));
-            int band = GetBandFromHz(hz);
-            if (band != currentBand) { currentBand = band; UpdateBandButton(); }
+            if (!vfoB)
+            {
+                int band = GetBandFromHz(hz);
+                if (band != currentBand) { currentBand = band; UpdateBandButton(); }
+            }
         }
 
         private void ParseVfoB(string r)
         {
             if (r.Length >= 3 && long.TryParse(r.Substring(2, r.Length - 3), out long hz))
+            {
+                currentVfoBHz = hz;
                 UpdateTextBox(VFOB_box, FormatFrequency(hz));
+                if (vfoB)
+                {
+                    int band = GetBandFromHz(hz);
+                    if (band != currentBand) { currentBand = band; UpdateBandButton(); }
+                }
+            }
         }
 
         private static string FormatFrequency(long hz)
@@ -341,7 +353,8 @@ namespace The590Box
         private void UpdateBandButton()
         {
             if (BANDB.InvokeRequired) { BANDB.BeginInvoke((Action)UpdateBandButton); return; }
-            BANDB.Text = BandLabels[currentBand];
+            BANDB.Text     = BandLabels[currentBand];
+            BANDB.BackColor = vfoB ? Color.DarkBlue : Color.DarkGreen;
         }
 
         private void BandButton_MouseClick(object sender, MouseEventArgs e)
@@ -373,8 +386,11 @@ namespace The590Box
 
         private void UpdateABBButton()
         {
-            ABB.Text      = vfoB ? "VFO-B" : "VFO-A";
-            ABB.BackColor = vfoB ? Color.DarkBlue : Color.DarkGreen;
+            ABB.Text        = vfoB ? "VFO-B" : "VFO-A";
+            ABB.BackColor   = vfoB ? Color.DarkBlue : Color.DarkGreen;
+            MINB.BackColor  = vfoB ? Color.DarkBlue : Color.DarkGreen;
+            PLUSB.BackColor = vfoB ? Color.DarkBlue : Color.DarkGreen;
+            UpdateBandButton();
         }
         #endregion
 
@@ -491,8 +507,8 @@ namespace The590Box
             return (idx >= 0 && idx < StepValues.Length) ? StepValues[idx] : StepValues[2];
         }
 
-        private void PLUSB_Click(object sender, EventArgs e) => StepVfoA(+1);
-        private void MINB_Click(object sender, EventArgs e) => StepVfoA(-1);
+        private void PLUSB_Click(object sender, EventArgs e) => StepActiveVfo(+1);
+        private void MINB_Click(object sender, EventArgs e) => StepActiveVfo(-1);
 
         private void ABB_Click(object sender, EventArgs e)
         {
@@ -501,13 +517,25 @@ namespace The590Box
             UpdateABBButton();
         }
 
-        private void StepVfoA(int direction)
+        private void StepActiveVfo(int direction)
         {
-            if (Serial_Port == null || !Serial_Port.IsOpen || currentVfoAHz == 0) return;
-            currentVfoAHz = Math.Max(0, currentVfoAHz + direction * GetSelectedStep());
-            IssueCmd($"FA{currentVfoAHz * 10L:D11};");
-            UpdateTextBox(VFOA_box, FormatFrequency(currentVfoAHz));
-            pollIndex = Array.IndexOf(pollCmds, CMD_READ_VFO1);
+            if (Serial_Port == null || !Serial_Port.IsOpen) return;
+            if (vfoB)
+            {
+                if (currentVfoBHz == 0) return;
+                currentVfoBHz = Math.Max(0, currentVfoBHz + direction * GetSelectedStep());
+                IssueCmd($"FB{currentVfoBHz * 10L:D11};");
+                UpdateTextBox(VFOB_box, FormatFrequency(currentVfoBHz));
+                pollIndex = Array.IndexOf(pollCmds, CMD_READ_VFO2);
+            }
+            else
+            {
+                if (currentVfoAHz == 0) return;
+                currentVfoAHz = Math.Max(0, currentVfoAHz + direction * GetSelectedStep());
+                IssueCmd($"FA{currentVfoAHz * 10L:D11};");
+                UpdateTextBox(VFOA_box, FormatFrequency(currentVfoAHz));
+                pollIndex = Array.IndexOf(pollCmds, CMD_READ_VFO1);
+            }
         }
 
 
