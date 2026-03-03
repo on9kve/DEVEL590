@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 // Code : Kees van Engelen (keesvanengelen@gmail.com)
 // 
-// Version : 6 (03 mrt 26); 
+// Version : 7b (03 mrt 26); 
 // Name    : The590Box 
 
 
@@ -100,6 +100,8 @@ namespace The590Box
         private bool rxAntennaOn = false;
         private bool dataOn = false; // Tracks the current DATA state
         private bool menuA = true; // Tracks the current MENU state
+        private long currentVfoAHz = 0; // Current VFO-A frequency in 10 Hz units
+        private static readonly long[] StepValues = { 10, 50, 100, 500, 900 }; // 100 Hz, 500 Hz, 1 kHz, 5 kHz, 9 kHz
                                    //      private bool isRxAntennaOff = false;
         private bool muted = false;
         private int savedVolume = 0;
@@ -180,7 +182,16 @@ namespace The590Box
             connectButton.Click      += ConnectButton_Click;
 
             // Band button
-            BANDB.MouseClick += BandButton_MouseClick;
+            BANDB.MouseDown += BandButton_MouseClick;
+
+            // Step combobox
+            STEP_combobox.Items.AddRange(new object[] { "100 Hz", "500 Hz", "1 kHz", "5 kHz", "9 kHz" });
+            STEP_combobox.SelectedIndex = 2; // default: 1 kHz
+            STEP_combobox.DrawItem += ComboBox_DrawItem;
+
+            // PLUSB / MINB
+            PLUSB.Click += PLUSB_Click;
+            MINB.Click  += MINB_Click;
         }
 
         private void UpdateTextBox(TextBox tb, string text, Color? foreColor = null)
@@ -282,6 +293,7 @@ namespace The590Box
         private void ParseVfoA(string r)
         {
             if (!long.TryParse(r.Substring(2, r.Length - 3), out long hz)) return;
+            currentVfoAHz = hz;
             UpdateTextBox(VFOA_box, FormatFrequency(hz));
             int band = GetBandFromHz(hz);
             if (band != currentBand) { currentBand = band; UpdateBandButton(); }
@@ -449,6 +461,24 @@ namespace The590Box
 
         private void ANT1B_click(object sender, MouseEventArgs e) { IssueCmd(CMD_SET_ANT1); }   //ANT1 on, ANT2 off
         private void ANT2B_click(object sender, MouseEventArgs e) { IssueCmd(CMD_SET_ANT2); }   //ANT2 on, ANT1 off
+
+        private long GetSelectedStep()
+        {
+            int idx = STEP_combobox.SelectedIndex;
+            return (idx >= 0 && idx < StepValues.Length) ? StepValues[idx] : StepValues[2];
+        }
+
+        private void PLUSB_Click(object sender, EventArgs e) => StepVfoA(+1);
+        private void MINB_Click(object sender, EventArgs e) => StepVfoA(-1);
+
+        private void StepVfoA(int direction)
+        {
+            if (Serial_Port == null || !Serial_Port.IsOpen || currentVfoAHz == 0) return;
+            currentVfoAHz = Math.Max(0, currentVfoAHz + direction * GetSelectedStep());
+            IssueCmd($"FA{currentVfoAHz * 10L:D11};");
+            UpdateTextBox(VFOA_box, FormatFrequency(currentVfoAHz));
+            pollIndex = Array.IndexOf(pollCmds, CMD_READ_VFO1);
+        }
 
 
 
