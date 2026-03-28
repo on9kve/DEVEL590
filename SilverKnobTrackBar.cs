@@ -7,6 +7,8 @@ namespace The590Box
 {
     internal class SilverKnobTrackBar : TrackBar
     {
+        private bool _dragging;
+
         public SilverKnobTrackBar()
         {
             AutoSize = false;
@@ -15,6 +17,68 @@ namespace The590Box
                 ControlStyles.AllPaintingInWmPaint |
                 ControlStyles.OptimizedDoubleBuffer,
                 true);
+        }
+
+        protected override void OnValueChanged(EventArgs e)
+        {
+            base.OnValueChanged(e);
+            Invalidate();
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_LBUTTONDOWN = 0x0201;
+            const int WM_MOUSEMOVE   = 0x0200;
+            const int WM_LBUTTONUP   = 0x0202;
+
+            switch (m.Msg)
+            {
+                case WM_LBUTTONDOWN:
+                    Focus();
+                    Capture = true;
+                    _dragging = true;
+                    UpdateValueFromY(GetY(m.LParam));
+                    return;
+                case WM_MOUSEMOVE:
+                    if (_dragging && (m.WParam.ToInt32() & 0x0001) != 0)
+                    {
+                        UpdateValueFromY(GetY(m.LParam));
+                        return;
+                    }
+                    break;
+                case WM_LBUTTONUP:
+                    if (_dragging)
+                    {
+                        _dragging = false;
+                        Capture = false;
+                        UpdateValueFromY(GetY(m.LParam));
+                        return;
+                    }
+                    break;
+            }
+            base.WndProc(ref m);
+        }
+
+        private static int GetY(IntPtr lParam)
+        {
+            int y = (lParam.ToInt32() >> 16) & 0xFFFF;
+            return y > 32767 ? y - 65536 : y;
+        }
+
+        private void UpdateValueFromY(int y)
+        {
+            const int vPad = 13;
+            int trackH = Height - 2 * vPad;
+            if (trackH <= 0) return;
+            double ratio = 1.0 - (double)(y - vPad) / trackH;
+            ratio = Math.Max(0.0, Math.Min(1.0, ratio));
+            int newValue = Minimum + (int)Math.Round(ratio * (Maximum - Minimum));
+            newValue = Math.Max(Minimum, Math.Min(Maximum, newValue));
+            if (newValue != Value)
+            {
+                Value = newValue;
+                OnScroll(EventArgs.Empty);
+            }
         }
 
         // Prevent the native Win32 TrackBar from auto-resizing based on range/tick config.
@@ -33,6 +97,7 @@ namespace The590Box
         protected override void OnPaint(PaintEventArgs e)
         {
             var g = e.Graphics;
+            g.ResetClip();
             g.Clear(BackColor);
 
             int cx = Width / 2;
