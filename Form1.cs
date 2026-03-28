@@ -21,7 +21,7 @@ namespace The590Box
     {
         private const string AppTitle = "The590Box v 11 - by Kees, ON9KVE";
 
-        #region Radio Commands — Yaesu FTDX-101 CAT
+        #region Radio Commands — Kenwood TS-590SG
         private const string CMD_READ_MODE = "MD;";
         private const string CMD_READ_ANT = "AN;";
         private const string CMD_READ_PREAMP = "PA;";
@@ -148,17 +148,24 @@ namespace The590Box
             this.FormClosing += MainForm_FormClosing;
 
             // ExtTuner button appearance + events
+            ExtTuneButton.FlatStyle = FlatStyle.Flat;
             ExtTuneButton.BackColor = Color.DarkGreen;
             ExtTuneButton.ForeColor = Color.Yellow;
-            ExtTuneButton.FlatAppearance.BorderSize = 0;
+            ExtTuneButton.FlatAppearance.BorderSize = 2;
+            ExtTuneButton.FlatAppearance.BorderColor = Color.White;
             ExtTuneButton.FlatAppearance.MouseDownBackColor = Color.Red;
             ExtTuneButton.FlatAppearance.MouseOverBackColor = Color.Blue;
-            ExtTuneButton.FlatAppearance.BorderColor = Color.White;
             ExtTuneButton.MouseDown += TuneButton_MouseDown;
             ExtTuneButton.MouseUp += TuneButton_MouseUp;
             ExtTuneButton.MouseEnter += TuneButton_MouseEnter;
             ExtTuneButton.MouseLeave += TuneButton_MouseLeave;
-            ExtTuneButton.Paint += TuneButton_Paint;
+            ExtTuneButton.Paint += (s, pe) =>
+            {
+                var btn = (Button)s!;
+                TextRenderer.DrawText(pe.Graphics, btn.Text, btn.Font,
+                    new Rectangle(0, 0, btn.Width, btn.Height), Color.Yellow,
+                    TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine);
+            };
 
             // Mode buttons
             USBB.MouseClick += USB_click;
@@ -609,18 +616,6 @@ namespace The590Box
         // --- External Tuner color change handlers ---
         private void TuneButton_MouseEnter(object sender, EventArgs e) { ExtTuneButton.BackColor = Color.Blue; }
         private void TuneButton_MouseLeave(object sender, EventArgs e) { ExtTuneButton.BackColor = Color.DarkGreen; }
-        private void TuneButton_Paint(object sender, PaintEventArgs e)
-        {
-            var btn = sender as System.Windows.Forms.Button;
-            if (btn == null) return;
-            int thickness = 3;
-            using (var pen = new Pen(Color.White, thickness))
-            {
-                pen.Alignment = System.Drawing.Drawing2D.PenAlignment.Inset;
-                e.Graphics.DrawRectangle(pen, new Rectangle(0, 0, btn.Width - thickness, btn.Height - thickness));
-            }
-        }
-
         private void ComboBox_DrawItem(object sender, DrawItemEventArgs e)
         {
             var cb = (ComboBox)sender;

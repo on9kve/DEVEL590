@@ -87,9 +87,9 @@ namespace The590Box
             ExtTuneButton.FlatAppearance.MouseOverBackColor = Color.Blue;
             ExtTuneButton.Font = new Font("Verdana", 8.25F, FontStyle.Bold);
             ExtTuneButton.ForeColor = Color.Yellow;
-            ExtTuneButton.Location = new Point(675, 81);
+            ExtTuneButton.Location = new Point(676, 81);
             ExtTuneButton.Name = "ExtTuneButton";
-            ExtTuneButton.Size = new Size(88, 40);
+            ExtTuneButton.Size = new Size(85, 40);
             ExtTuneButton.TabIndex = 8;
             ExtTuneButton.Text = "Ext Tuner";
             ExtTuneButton.UseVisualStyleBackColor = false;
@@ -391,9 +391,9 @@ namespace The590Box
             ItuneOn.FlatAppearance.MouseOverBackColor = Color.Blue;
             ItuneOn.Font = new Font("Verdana", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             ItuneOn.ForeColor = Color.Yellow;
-            ItuneOn.Location = new Point(676, 41);
+            ItuneOn.Location = new Point(675, 41);
             ItuneOn.Name = "ItuneOn";
-            ItuneOn.Size = new Size(44, 40);
+            ItuneOn.Size = new Size(45, 40);
             ItuneOn.TabIndex = 56;
             ItuneOn.Text = "On";
             ItuneOn.UseVisualStyleBackColor = false;
