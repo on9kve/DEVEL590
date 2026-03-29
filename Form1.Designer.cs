@@ -295,6 +295,7 @@ namespace The590Box
             // 
             pwrControlTrackBar.AutoSize = false;
             pwrControlTrackBar.BackColor = Color.Maroon;
+            pwrControlTrackBar.KnobColor = Color.Red;
             pwrControlTrackBar.Location = new Point(769, 1);
             pwrControlTrackBar.Maximum = 100;
             pwrControlTrackBar.Minimum = 5;

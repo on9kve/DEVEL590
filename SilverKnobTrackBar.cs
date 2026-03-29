@@ -9,6 +9,8 @@ namespace The590Box
     {
         private bool _dragging;
 
+        public Color KnobColor { get; set; } = Color.Silver;
+
         public SilverKnobTrackBar()
         {
             AutoSize = false;
@@ -134,10 +136,10 @@ namespace The590Box
             var thumb    = new Rectangle(cx - thumbW / 2, thumbCY - thumbH / 2, thumbW, thumbH);
             var gradRect = new Rectangle(thumb.X, thumb.Y, thumb.Width, Math.Max(thumb.Height, 1));
 
-            using (var grad = new LinearGradientBrush(gradRect, Color.White, Color.Silver, LinearGradientMode.Vertical))
+            using (var grad = new LinearGradientBrush(gradRect, ControlPaint.Light(KnobColor), KnobColor, LinearGradientMode.Vertical))
                 g.FillRectangle(grad, thumb);
 
-            using (var border = new Pen(Color.Gray, 1))
+            using (var border = new Pen(ControlPaint.Dark(KnobColor), 1))
                 g.DrawRectangle(border, thumb);
         }
     }
